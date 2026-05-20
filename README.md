@@ -156,6 +156,8 @@ jobs:
 
 #### I will breakdown segments of the file to explain what each part does
 
+#### This part of the file will run this pipeline when the code is pushed to main, it will also run this pipeline when a pull request targets main too.
+
 ```
 on:
   push:
@@ -166,20 +168,20 @@ on:
       - main
 ```
 
-#### This part of the file will run this pipeline when the code is pushed to main, it will also run this pipeline when a pull request targets main too.
+#### This section will create a job, this is a group of steps, in this case Github will run the pipeline on a temporary Ubuntu Linux machine
 
 ```
 jobs:
   test-build-push:
     runs-on: ubuntu-latest
 ```
-#### This section will create a job, this is a group of steps, in this case Github will run the pipeline on a temporary Ubuntu Linux machine
+#### This part will download the repository code into the runner, without this Github actions would start with an empty machine. 
 
 ```
 - name: Checkout repository
   uses: actions/checkout@v4
 ```
-#### This part will download the repository code into the runner, without this Github actions would start with an empty machine. 
+#### This part will install Python version 3.12
 
 ```
 - name: Set up Python
@@ -188,7 +190,7 @@ jobs:
     python-version: "3.12"
 ```
 
-#### This part will install Python version 3.12
+#### This part will read the requirements.txt file and then install the dependencies listed, in this case that will be flask and pytest
 
 ```
 - name: Install dependencies
@@ -196,13 +198,13 @@ jobs:
     pip install --upgrade pip
     pip install -r requirements.txt
 ```
-#### This part will read the requirements.txt file and then install the dependencies listed, in this case that will be flask and pytest
+#### This part will run my pytest, if the test is successful then the pipeline will continue, if not then it stop.
 
 ```
 - name: Run tests
   run: pytest
 ```
-#### This part will run my pytest, if the test is successful then the pipeline will continue, if not then it stop.
+#### This part will log into Docker Hub, the username and token will not be written directly in the file, they will be stored as Github repository secrets to follow best practice. 
 
 ```
 - name: Log in to Docker Hub
@@ -212,8 +214,8 @@ jobs:
     username: ${{ secrets.DOCKER_USERNAME }}
     password: ${{ secrets.DOCKER_TOKEN }}
 ```
-
-#### This part will log into Docker Hub, the username and token will not be written directly in the file, they will be stored as Github repository secrets to follow best practice. 
+#### This section uses Docker's official build-push action, this is how Docker images are pushed and built within Github actions
+#### The "context: ." will build the docker image using the current project folder
 
 ```
 - name: Build and push Docker image
@@ -224,13 +226,13 @@ jobs:
     push: true
     tags: yourdockerhubusername/flaskapp:latest
 ```
-#### This section uses Docker's official build-push action, this is how Docker images are pushed and built within Github actions
-#### The "context: ." will build the docker image using the current project folder
+
+#### This part will ensure that the Docker Hub login and Docker push will only occur when code is pushed to main, for pull requests the pipeline will run tests but will not push a Docker image, this follows best practice. The reason for this is that if a developer created a pull request that had broker or unfinished code and the github.event_name check was not there then the broken or unfinished code could be deployed. 
 
 ```
 if: github.event_name == 'push'
 ```
-#### This part will ensure that the Docker Hub login and Docker push will only occur when code is pushed to main, for pull requests the pipeline will run tests but will not push a Docker image, this follows best practice. The reason for this is that if a developer created a pull request that had broker or unfinished code and the github.event_name check was not there then the broken or unfinished code could be deployed. 
+
 
 ## - Adding the repository secrets - 
 #### Since my workflow will use the Docker username and Docker token from the repository secrets I will need to generate a docker token for this. I went to Docker Hub and generated a token, I then went to my Github repository and then created two new secrets, one named "DOCKER_USERNAME" and one named "DOCKER_TOKEN".
@@ -289,6 +291,7 @@ git push origin main
 #### In this project, I built a CI/CD pipeline for a Dockerized Flask application using GitHub Actions. The pipeline automatically installs dependencies, runs Python tests with pytest, builds a Docker image, and pushes the image to Docker Hub whenever code is pushed to the main branch.
 
 #### This project helped me develop a better understanding of Git workflows, GitHub Actions, automated testing, Docker image management, and the fundamentals of continuous integration and continuous delivery (CI/CD).
+
 
 
 
