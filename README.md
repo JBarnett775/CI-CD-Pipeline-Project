@@ -10,13 +10,16 @@
 
 #### Currently my directory looks like this:
 
+```
 flaskapp/
 ├── tests/
+│   └── test_app.py
 ├── app.py
 ├── requirements.txt
 ├── Dockerfile
 ├── .dockerignore
 └── README.md
+```
 
 #### Now I have created a test folder and have added a file called "test_app.py" and have added the following code
 ```
@@ -62,6 +65,7 @@ python3 -m pytest
 
 #### This proves that my pytest is working as intended, I shall now change the equation back to what it was, after running this test my project structure looks like the following
 
+```
 flaskapp/
 ├── tests/
 │   └── test_app.py
@@ -70,6 +74,7 @@ flaskapp/
 ├── Dockerfile
 ├── .dockerignore
 └── README.md
+```
 
 ## - Creating a Github actions folder -
 #### to create this folder I will use the CLI interface, the command I shall enter into the terminal is 
